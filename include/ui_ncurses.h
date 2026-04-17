@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    char name[20];
+    char *name;
     uint8_t command_id;
     int current_value;
 } MenuItem;
