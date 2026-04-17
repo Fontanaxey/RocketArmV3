@@ -1,0 +1,9 @@
+{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "files.associations": {
+        "*.h": "c",
+        "iostream": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
+}
