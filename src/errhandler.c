@@ -24,13 +24,13 @@ void log_event(LogType type, const char *msg)
         level_str = "FATAL";
         break;
     default:
-        return; // Signature corretta da FILE* a void
+        return;
     }
 
     time_t now = time(NULL);
     char *timestamp = ctime(&now);
     if (timestamp)
-        timestamp[24] = '\0'; // Previene crash su failure di ctime
+        timestamp[24] = '\0';
 
     FILE *file = fopen(filepath, "a");
     if (file == NULL)
@@ -45,5 +45,5 @@ void log_event(LogType type, const char *msg)
     else
         fprintf(file, "[%s] [%s]: %s\n", timestamp, level_str, msg);
 
-    fclose(file); // Essenziale per evitare leak di risorse
+    fclose(file);
 }

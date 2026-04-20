@@ -58,8 +58,8 @@ int main()
 
     ui_cleanup();
 
-    printf("\n[TEST MODE] Interfaccia chiusa correttamente.\n");
-    printf("Lo stato finale del braccio era:\n");
+    printf("\n[TEST MODE] Interface closed correctly.\n");
+    printf("The final state of the arm was:\n");
     for (int i = 0; i < num_items; i++)
         printf(" - %-12s: %d\n", arm_items[i].name, arm_items[i].current_value);
     return 0;
