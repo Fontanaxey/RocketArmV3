@@ -2,48 +2,63 @@
 #include <time.h>
 #include <errno.h>
 #include <string.h>
+#include <libgen.h>
+#include <unistd.h>
 #include "errhandler.h"
+
+static void get_absolute_log_path(char *dest, size_t dest_size, const char *filename)
+{
+    char exe_path[4096];
+    ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
+    if (len != -1)
+    {
+        exe_path[len] = '\0';
+        char *exe_dir = dirname(exe_path);
+        snprintf(dest, dest_size, "%s/../logs/%s", exe_dir, filename);
+    }
+    else
+        snprintf(dest, dest_size, "logs/%s", filename);
+}
 
 void log_event(LogType type, const char *msg)
 {
-    const char *filepath;
+    char final_path[4096];
+    const char *filename;
     const char *level_str;
 
     switch (type)
     {
     case ACCESS:
-        filepath = "logs/access_logs";
+        filename = "access_logs.txt";
         level_str = "ACCESS";
         break;
     case WARNING:
-        filepath = "logs/error_log";
+        filename = "error_logs.txt";
         level_str = "WARN";
         break;
     case FATAL:
-        filepath = "logs/error_log";
+        filename = "error_logs.txt";
         level_str = "FATAL";
         break;
     default:
         return;
     }
 
-    time_t now = time(NULL);
-    char *timestamp = ctime(&now);
-    if (timestamp)
-        timestamp[24] = '\0';
+    get_absolute_log_path(final_path, sizeof(final_path), filename);
 
-    FILE *file = fopen(filepath, "a");
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    char timestamp[20];
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", t);
+
+    FILE *file = fopen(final_path, "a");
     if (file == NULL)
     {
-        fprintf(stderr, "[%s] [SYS_CRIT] Failed I/O on %s: %s\n", timestamp ? timestamp : "UNKNOWN", filepath, strerror(errno));
-        fprintf(stderr, "[%s] [%s]: %s\n", timestamp ? timestamp : "UNKNOWN", level_str, msg);
+        // Se fallisce ancora, è un problema di permessi o cartella mancante
+        fprintf(stderr, "[%s] [CRIT] Cannot open log %s: %s\n", timestamp, final_path, strerror(errno));
         return;
     }
 
-    if (!strcmp("ACCESS", level_str))
-        fprintf(file, "[%s]: %s logged in as\n", timestamp, msg);
-    else
-        fprintf(file, "[%s] [%s]: %s\n", timestamp, level_str, msg);
-
+    fprintf(file, "[%s] [%s]: %s\n", timestamp, level_str, msg);
     fclose(file);
 }

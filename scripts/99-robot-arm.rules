@@ -1,0 +1,2 @@
+KERNEL=="ttyACM*", MODE="0666"
+KERNEL=="ttyUSB*", MODE="0666"
