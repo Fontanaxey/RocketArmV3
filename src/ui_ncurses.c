@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "ui_ncurses.h"
 #include "errhandler.h"
+#include "version.h"
 
 void ui_init(void)
 {
