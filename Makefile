@@ -1,3 +1,12 @@
+# Versioning
+VERSION_MAJOR  = 0
+VERSION_MINOR  = 1
+VERSION_PATCH  = 1
+VERSION_SUFFIX = -alpha
+
+VERSION_STR = "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)$(VERSION_SUFFIX)"
+
+CFLAGS += -DAPP_VERSION=$(VERSION_STR)
 CC       := gcc
 CFLAGS   := -Wall -Wextra -Werror -Iinclude -O2 -g -MMD -MP
 LDLIBS   := -lncurses

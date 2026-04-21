@@ -5,10 +5,13 @@
 #include "protocol.h"
 #include "errhandler.h"
 #include "serial_linux.h"
+#include "version.h"
 
 int main()
 {
-    log_event(ACCESS, "Application started by user");
+    char start_msg[64];
+    snprintf(start_msg, sizeof(start_msg), "%s v%s started", APP_NAME, APP_VERSION);
+    log_event(ACCESS, start_msg);
 
     MenuItem arm_items[] = {
         {"Base Motor", 0x01, DEFAULT_POS},
