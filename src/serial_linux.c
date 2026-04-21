@@ -23,7 +23,7 @@ int serial_init(const char *device_path)
     struct termios tty;
     if (tcgetattr(fd, &tty) != 0)
     {
-        snprintf(err_msg, sizeof(err_msg), "tcgetattr failed on %s: %s", device_path, strerror(errno));
+        snprintf(err_msg, sizeof(err_msg), "tcgetattr failed: %s", strerror(errno));
         log_event(FATAL, err_msg);
         close(fd);
         return -1;
@@ -33,26 +33,29 @@ int serial_init(const char *device_path)
     cfsetispeed(&tty, B9600);
 
     tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;
-    tty.c_iflag &= ~IGNBRK;
-    tty.c_lflag = 0;
-    tty.c_oflag = 0;
-    tty.c_cc[VMIN] = 0;
-    tty.c_cc[VTIME] = 5;
-
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY);
-    tty.c_cflag |= (CLOCAL | CREAD);
     tty.c_cflag &= ~(PARENB | PARODD);
     tty.c_cflag &= ~CSTOPB;
 
+    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+    tty.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+    tty.c_oflag &= ~OPOST;
+
+    tty.c_cc[VMIN] = 0;
+    tty.c_cc[VTIME] = 5;
+
+    tty.c_cflag |= (CLOCAL | CREAD);
+
     if (tcsetattr(fd, TCSANOW, &tty) != 0)
     {
-        snprintf(err_msg, sizeof(err_msg), "tcsetattr failed on %s: %s", device_path, strerror(errno));
+        snprintf(err_msg, sizeof(err_msg), "tcsetattr failed: %s", strerror(errno));
         log_event(FATAL, err_msg);
         close(fd);
         return -1;
     }
 
-    snprintf(err_msg, sizeof(err_msg), "Serial device %s initialized successfully on fd %d", device_path, fd);
+    tcflush(fd, TCIOFLUSH);
+
+    snprintf(err_msg, sizeof(err_msg), "Serial initialized: %s (9600 8N1)", device_path);
     log_event(ACCESS, err_msg);
     return fd;
 }
@@ -60,19 +63,21 @@ int serial_init(const char *device_path)
 int serial_send(int fd, RobotPacket pkt)
 {
     if (fd < 0)
-    {
-        log_event(WARNING, "serial_send invoked with invalid file descriptor");
         return -1;
-    }
 
     ssize_t n = write(fd, &pkt, sizeof(RobotPacket));
+
     if (n != (ssize_t)sizeof(RobotPacket))
     {
-        char err_msg[256];
-        snprintf(err_msg, sizeof(err_msg), "Incomplete write. Expected %zu, wrote %zd: %s", sizeof(RobotPacket), n, strerror(errno));
+        char err_msg[128];
+        snprintf(err_msg, sizeof(err_msg), "Write mismatch: sent %zd/%zu bytes", n, sizeof(RobotPacket));
         log_event(WARNING, err_msg);
         return -1;
     }
+
+    // Optional: force to drain the output buffer to ensure the packet is sent immediately.
+    // tcdrain(fd);
+
     return 0;
 }
 
@@ -80,17 +85,10 @@ void serial_close(int fd)
 {
     if (fd >= 0)
     {
+        tcdrain(fd);
         if (close(fd) < 0)
-        {
-            char err_msg[128];
-            snprintf(err_msg, sizeof(err_msg), "Failed to close fd %d: %s", fd, strerror(errno));
-            log_event(WARNING, err_msg);
-        }
+            log_event(WARNING, "Error during serial_close");
         else
-        {
-            char log_msg[64];
-            snprintf(log_msg, sizeof(log_msg), "Serial connection closed on fd %d", fd);
-            log_event(ACCESS, log_msg);
-        }
+            log_event(ACCESS, "Serial port closed cleanly");
     }
 }

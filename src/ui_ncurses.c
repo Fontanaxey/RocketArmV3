@@ -19,31 +19,34 @@ void ui_init(void)
     log_event(ACCESS, "UI module initialized successfully");
 }
 
-void ui_render(MenuItem *items, int count, int selected_idx)
+void ui_render(MenuItem *items, int num_items, int selected, int is_connected)
 {
     erase();
 
-    attron(A_BOLD | A_UNDERLINE);
-    mvprintw(0, 0, "--- RocketArm V3 Controller ---");
-    attroff(A_BOLD | A_UNDERLINE);
+    move(1, 2);
+    printw("--- ROCKET ARM V3 CONTROL ---");
 
-    mvprintw(2, 0, "Use UP/DOWN to select, LEFT/RIGHT to move, Q to quit");
-
-    int max_items = (LINES - 4 > 0) ? (LINES - 4) : 0;
-    int display_count = (count < max_items) ? count : max_items;
-
-    for (int i = 0; i < display_count; i++)
+    move(1, 40);
+    if (is_connected)
     {
-        if (i == selected_idx)
-        {
+        attron(COLOR_PAIR(1));
+        printw("[ ONLINE ]");
+        attroff(COLOR_PAIR(1));
+    }
+    else
+    {
+        attron(COLOR_PAIR(2) | A_BLINK);
+        printw("[! OFFLINE !]");
+        attroff(COLOR_PAIR(2) | A_BLINK);
+    }
+
+    for (int i = 0; i < num_items; i++)
+    {
+        if (i == selected)
             attron(A_REVERSE);
-            mvprintw(4 + i, 2, "> %-12s : [%3d]", items[i].name, items[i].current_value);
+        mvprintw(3 + i, 2, "%-15s: [%3d]", items[i].name, items[i].current_value);
+        if (i == selected)
             attroff(A_REVERSE);
-        }
-        else
-        {
-            mvprintw(4 + i, 2, "  %-12s : [%3d]", items[i].name, items[i].current_value);
-        }
     }
 
     refresh();

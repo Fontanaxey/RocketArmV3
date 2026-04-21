@@ -13,6 +13,6 @@ typedef struct
 void ui_init(void);
 void ui_cleanup(void);
 
-void ui_render(MenuItem *items, int count, int selected_idx);
+void ui_render(MenuItem *items, int num_items, int selected, int is_connected);
 
 #endif

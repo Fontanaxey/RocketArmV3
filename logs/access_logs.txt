@@ -1,3 +1,16 @@
 [2026-04-20 14:02:50] [ACCESS]: memedesimo
 [2026-04-20 14:02:50] [ACCESS]: UI module initialized successfully
 [2026-04-20 14:02:53] [ACCESS]: UI module shutting down
+[2026-04-20 14:22:49] [ACCESS]: Application started by user
+[2026-04-20 14:22:49] [ACCESS]: Serial initialized: /tmp/ttyV0 (9600 8N1)
+[2026-04-20 14:22:49] [ACCESS]: UI module initialized successfully
+[2026-04-20 14:23:25] [ACCESS]: UI module shutting down
+[2026-04-20 14:23:25] [ACCESS]: Serial port closed cleanly
+[2026-04-20 14:34:22] [ACCESS]: Application started by user
+[2026-04-20 14:34:22] [ACCESS]: UI module initialized successfully
+[2026-04-20 14:34:46] [ACCESS]: UI module shutting down
+[2026-04-20 14:34:48] [ACCESS]: Application started by user
+[2026-04-20 14:34:48] [ACCESS]: Serial initialized: /tmp/ttyV0 (9600 8N1)
+[2026-04-20 14:34:48] [ACCESS]: UI module initialized successfully
+[2026-04-20 14:37:23] [ACCESS]: UI module shutting down
+[2026-04-20 14:37:23] [ACCESS]: Serial port closed cleanly

@@ -21,7 +21,18 @@ typedef struct __attribute__((packed))
 
 static inline uint8_t calculate_checksum(uint8_t id, uint8_t value)
 {
-    return (START_BYTE ^ id ^ value ^ END_BYTE);
+    return (id ^ value);
+}
+
+static inline void protocol_create_packet(RobotPacket *pkt, uint8_t id, uint8_t value)
+{
+    if (!pkt)
+        return;
+    pkt->start = START_BYTE;
+    pkt->id = id;
+    pkt->value = value;
+    pkt->checksum = calculate_checksum(id, value);
+    pkt->end = END_BYTE;
 }
 
 #endif

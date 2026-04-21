@@ -1,12 +1,15 @@
 #include <ncurses.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "ui_ncurses.h"
 #include "protocol.h"
 #include "errhandler.h"
+#include "serial_linux.h"
 
 int main()
 {
-    log_event(ACCESS, "memedesimo");
+    log_event(ACCESS, "Application started by user");
+
     MenuItem arm_items[] = {
         {"Base Motor", 0x01, DEFAULT_POS},
         {"Joint 1", 0x02, DEFAULT_POS},
@@ -19,12 +22,20 @@ int main()
     int selected = 0;
     int running = 1;
 
+    int serial_fd = serial_init("/tmp/ttyV0");
+    int is_connected = (serial_fd >= 0);
+
+    if (!is_connected)
+        log_event(WARNING, "Running in SIMULATION MODE (No hardware detected)");
+
     ui_init();
 
     while (running)
     {
-        ui_render(arm_items, num_items, selected);
+        ui_render(arm_items, num_items, selected, is_connected);
+
         int ch = getch();
+        int value_changed = 0;
 
         switch (ch)
         {
@@ -38,29 +49,55 @@ int main()
 
         case KEY_RIGHT:
             if (arm_items[selected].current_value < ANGLE_MAX)
+            {
                 arm_items[selected].current_value += 1;
+                value_changed = 1;
+            }
             break;
 
         case KEY_LEFT:
             if (arm_items[selected].current_value > ANGLE_MIN)
+            {
                 arm_items[selected].current_value -= 1;
+                value_changed = 1;
+            }
             break;
 
         case 'q':
         case 'Q':
             running = 0;
             break;
+        }
 
-        default:
-            break;
+        if (value_changed)
+        {
+            if (serial_fd < 0)
+                is_connected = 0;
+            else
+            {
+                RobotPacket pkt;
+                protocol_create_packet(&pkt, arm_items[selected].command_id, (uint8_t)arm_items[selected].current_value);
+
+                if (serial_send(serial_fd, pkt) != 0)
+                {
+                    if (is_connected)
+                        log_event(WARNING, "Communication lost: serial_send failed");
+                    is_connected = 0;
+                }
+                else
+                    is_connected = 1;
+            }
         }
     }
 
     ui_cleanup();
 
-    printf("\n[TEST MODE] Interface closed correctly.\n");
-    printf("The final state of the arm was:\n");
+    if (serial_fd >= 0)
+        serial_close(serial_fd);
+
+    printf("\n[FINAL STATE] Interface closed correctly.\n");
     for (int i = 0; i < num_items; i++)
         printf(" - %-12s: %d\n", arm_items[i].name, arm_items[i].current_value);
+
     return 0;
 }

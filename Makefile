@@ -6,11 +6,15 @@ SRC_DIR   := src
 INC_DIR   := include
 BUILD_DIR := build
 BIN_DIR   := bin
+DOC_DIR   := docs
 
 TARGET    := $(BIN_DIR)/robot_arm
 SRCS      := $(wildcard $(SRC_DIR)/*.c)
 OBJS      := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 DEPS      := $(OBJS:.o=.d)
+
+# Binari necessari
+DOXYGEN   := $(shell command -v doxygen 2> /dev/null)
 
 all: directories $(TARGET)
 
@@ -27,8 +31,16 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 
 -include $(DEPS)
 
+# Target Documentazione con controllo dipendenza
+doc:
+ifndef DOXYGEN
+	$(error "Doxygen non è installato. Esegui: sudo apt install doxygen graphviz")
+endif
+	@echo "Generating documentation..."
+	$(DOXYGEN) Doxyfile
+
 clean:
 	@echo "Cleaning up..."
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rf $(BUILD_DIR) $(BIN_DIR) $(DOC_DIR)
 
-.PHONY: all directories clean
+.PHONY: all clean directories doc

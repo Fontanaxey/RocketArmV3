@@ -54,7 +54,6 @@ void log_event(LogType type, const char *msg)
     FILE *file = fopen(final_path, "a");
     if (file == NULL)
     {
-        // Se fallisce ancora, è un problema di permessi o cartella mancante
         fprintf(stderr, "[%s] [CRIT] Cannot open log %s: %s\n", timestamp, final_path, strerror(errno));
         return;
     }
