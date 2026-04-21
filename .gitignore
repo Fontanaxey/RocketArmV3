@@ -1,19 +1,34 @@
+# --- Bin & object ---
 bin/
 build/
 *.o
 *.d
 *.out
+
+# --- Doc ---
 docs/
 html/
 latex/
 Doxyfile.bak
+doxygen_objdb_*
+
+# --- Logs ---
 logs/*
 !logs/.gitkeep
-*.swp
-*~
-.DS_Store
-Thumbs.db
+
+# --- Python (Testing suite) ---
 PyTest.venv/
+__pycache__/
+*.py[cod]
+
+# --- IDE & Editor ---
 .vscode/
 *.code-workspace
 .directory
+*.swp
+*~
+*.bak
+
+# --- System ---
+.DS_Store
+Thumbs.db
