@@ -20,7 +20,7 @@ A professional-grade **Linux CLI application** written in C for high-precision c
 ├── scripts/            # Automation & Testing (udev rules, python, socat)
 ├── logs/               # Application & Error logs
 ├── Doxyfile
-├── Makefile
+├── CMakeLists.txt
 └── LICENSE.md
 ```
 
@@ -39,7 +39,7 @@ Generate the technical manual and call graphs using Doxygen:
 
 ```bash
 sudo apt install doxygen graphviz
-make doc
+cmake --build build --target doc
 # Open docs/html/index.html in your browser
 ```
 
@@ -50,12 +50,12 @@ make doc
    ```bash
    git clone [https://github.com/Fontanaxey/RocketArmV3.git](https://github.com/Fontanaxey/RocketArmV3.git)
    cd RocketArmV3
-   ```
 
-2. **Build the Project**:
+2. **Build**:
 
     ```bash
-    make clean && make
+    cmake -B build
+    cmake --build build
     ```
 
 3. Setup Environment:
