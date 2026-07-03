@@ -25,7 +25,7 @@ void ui_render(MenuItem *items, int num_items, int selected, int is_connected)
     erase();
     mvprintw(0, 2, "%s v%s", APP_NAME, APP_VERSION);
     move(1, 2);
-    printw("--- ROCKET ARM V3 CONTROL ---");
+    printw("--- ROCKET ARM V3 CONTROL --- (q to quit)");
 
     move(1, 40);
     if (is_connected)

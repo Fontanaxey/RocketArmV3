@@ -1,39 +1,41 @@
 #!/bin/bash
 
-PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BIN_APP="$PROJECT_ROOT/bin/robot_arm"
-VENV_PYTHON="$PROJECT_ROOT/PyTest.venv/bin/python3"
-VALIDATOR_PY="$PROJECT_ROOT/scripts/test_protocol.py"
-SETUP_SH="$PROJECT_ROOT/scripts/virtual_serial.sh"
+# Hardcoding dei percorsi assoluti (le virgolette gestiscono lo spazio in 'VS Code')
+ROOT_DIR="/home/fontanaxey/Documents/VS Code/RocketArmV3"
+SCRIPT_DIR="$ROOT_DIR/scripts"
+EXEC_PATH="$ROOT_DIR/bin/robot_arm"
+PYTHON_BIN="$ROOT_DIR/PyTest.venv/bin/python"
 
-if [ ! -f "$BIN_APP" ]; then
-    echo "Error: Compile the project first."
+# Verifica preventiva dell'esistenza del binario
+if [ ! -f "$EXEC_PATH" ]; then
+    echo "[-] Errore: Il binario 'robot_arm' non esiste in: $EXEC_PATH" >&2
     exit 1
 fi
 
-if command -v gnome-terminal >/dev/null; then
-    TERM_CMD="gnome-terminal -- bash -c"
-elif command -v xterm >/dev/null; then
-    TERM_CMD="xterm -e"
-else
-    echo "Error: No terminal emulator (gnome-terminal, xterm) found."
-    exit 1
+# Fallback se il virtual environment non è ancora stato creato
+if [ ! -f "$PYTHON_BIN" ]; then
+    echo "[!] PyTest.venv non trovato. Fallback sul python3 di sistema."
+    PYTHON_BIN="python3"
 fi
 
-echo "Initializing multi-terminal environment..."
+# Assicura i permessi di esecuzione sugli script
+chmod +x "$SCRIPT_DIR/virtual_serial.sh"
 
-$TERM_CMD "$SETUP_SH; exec bash" &
-sleep 1.5
+# 1. Avvia virtual_serial.sh in una nuova finestra GNOME Terminal
+echo "[+] Lancio virtual_serial.sh in finestra separata..."
+gnome-terminal --title="Virtual Serial" -- bash -c "\"$SCRIPT_DIR/virtual_serial.sh\"; exec bash" &
 
-if [ -f "$VENV_PYTHON" ]; then
-    $TERM_CMD "$VENV_PYTHON $VALIDATOR_PY --port /tmp/vnode1; exec bash" &
-else
-    echo "Warning: Virtual environment not found, launching with system python3."
-    $TERM_CMD "python3 $VALIDATOR_PY --port /tmp/vnode1; exec bash" &
-fi
-sleep 1.5
+# Attesa per il binding dei nodi tty virtuali
+sleep 1
 
-echo "Launching control interface..."
-$TERM_CMD "$BIN_APP /tmp/vnode0" &
+# 2. Avvia test_protocol.py nel venv in una seconda finestra GNOME Terminal
+echo "[+] Lancio test_protocol.py in finestra separata..."
+gnome-terminal --title="Test Protocol" -- bash -c "\"$PYTHON_BIN\" \"$SCRIPT_DIR/test_protocol.py\"; exec bash" &
 
-echo "Stack started successfully."
+# Attesa stabilizzazione dello script Python
+sleep 0.5
+
+# 3. Esegue robot_arm in foreground nel terminale corrente
+echo "[+] Esecuzione di robot_arm in questa shell..."
+echo "------------------------------------------------------------------------"
+"$EXEC_PATH"

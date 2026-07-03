@@ -80,7 +80,6 @@ int main()
             {
                 RobotPacket pkt;
                 protocol_create_packet(&pkt, arm_items[selected].command_id, (uint8_t)arm_items[selected].current_value);
-
                 if (serial_send(serial_fd, pkt) != 0)
                 {
                     if (is_connected)
@@ -92,15 +91,11 @@ int main()
             }
         }
     }
-
     ui_cleanup();
-
     if (serial_fd >= 0)
         serial_close(serial_fd);
-
     printf("\n[FINAL STATE] Interface closed correctly.\n");
     for (int i = 0; i < num_items; i++)
         printf(" - %-12s: %d\n", arm_items[i].name, arm_items[i].current_value);
-
     return 0;
 }
