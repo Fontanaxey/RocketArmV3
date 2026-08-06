@@ -3,15 +3,16 @@
 #include <stdlib.h>
 #include "ui_ncurses.h"
 #include "protocol.h"
-#include "errhandler.h"
+#include "err_handler.h"
 #include "serial_linux.h"
 #include "version.h"
+#include "users_handler.h"
 
 int main()
 {
     char start_msg[64];
     snprintf(start_msg, sizeof(start_msg), "%s v%s started", APP_NAME, APP_VERSION);
-    log_event(ACCESS, start_msg);
+    log_event(LOG_INFO, start_msg);
 
     MenuItem arm_items[] = {
         {"Base Motor", 0x01, DEFAULT_POS},
@@ -29,7 +30,7 @@ int main()
     int is_connected = (serial_fd >= 0);
 
     if (!is_connected)
-        log_event(WARNING, "Running in SIMULATION MODE (No hardware detected)");
+        log_event(LOG_WARN, "Running in SIMULATION MODE (No hardware detected)");
 
     ui_init();
 
@@ -83,7 +84,7 @@ int main()
                 if (serial_send(serial_fd, pkt) != 0)
                 {
                     if (is_connected)
-                        log_event(WARNING, "Communication lost: serial_send failed");
+                        log_event(LOG_WARN, "Communication lost: serial_send failed");
                     is_connected = 0;
                 }
                 else
