@@ -5,16 +5,13 @@ import serial
 SERIAL_PORT = '/tmp/ttyV1'
 BAUD_RATE = 9600
 
-# Risoluzione dinamica del percorso dei log relativo alla posizione di questo script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE_PATH = os.path.join(SCRIPT_DIR, '..', 'logs', 'commands_logs.txt')
 
-# Assicura che la cartella logs esista
 os.makedirs(os.path.dirname(LOG_FILE_PATH), exist_ok=True)
 
 def validate_packet(data):
     if len(data) != 5:
-        # CORRETTO: Aggiunta la 'f' mancante per l'interpolazione della stringa
         return False, f"Invalid packet length: Expected 5 bytes, got {len(data)}"
     
     start, dev_id, val, cksum, end = data
@@ -28,7 +25,6 @@ def validate_packet(data):
     
     return True, f"ID: {dev_id} | Value: {val}"
 
-# Apertura del file di log con buffering a 0 (flush immediato)
 try:
     with open(LOG_FILE_PATH, 'w', encoding='utf-8') as log_file:
         log_file.write(f"[*] Listening on {SERIAL_PORT}...\n")
@@ -47,17 +43,15 @@ try:
                     else:
                         log_file.write(f"[ERR] {msg}\n")
                     
-                    log_file.flush() # Forza la scrittura su disco immediata
+                    log_file.flush()
 
 except KeyboardInterrupt:
-    # Gestione della chiusura pulita quando lo script viene terminato dal modulo bash
     sys.exit(0)
 
 except Exception as e:
-    # Se fallisce l'apertura del file o la seriale, tenta di scrivere l'errore fatale
     try:
         with open(LOG_FILE_PATH, 'a', encoding='utf-8') as log_file:
             log_file.write(f"[FATAL] Error: {e}\n")
     except Exception:
-        print(f"[FATAL] Errore critico non loggabile su file: {e}", file=sys.stderr)
+        print(f"[FATAL] Critical error not loggable: {e}", file=sys.stderr)
     sys.exit(1)

@@ -16,7 +16,7 @@ int serial_init(const char *device_path)
     if (fd < 0)
     {
         snprintf(err_msg, sizeof(err_msg), "Failed to open device %s: %s", device_path, strerror(errno));
-        log_event(LOG_FATAL, err_msg);
+        log_event(LOG_FATAL, "%s", err_msg);
         return -1;
     }
 
@@ -24,7 +24,7 @@ int serial_init(const char *device_path)
     if (tcgetattr(fd, &tty) != 0)
     {
         snprintf(err_msg, sizeof(err_msg), "tcgetattr failed: %s", strerror(errno));
-        log_event(LOG_FATAL, err_msg);
+        log_event(LOG_FATAL, "%s", err_msg);
         close(fd);
         return -1;
     }
@@ -48,7 +48,7 @@ int serial_init(const char *device_path)
     if (tcsetattr(fd, TCSANOW, &tty) != 0)
     {
         snprintf(err_msg, sizeof(err_msg), "tcsetattr failed: %s", strerror(errno));
-        log_event(LOG_FATAL, err_msg);
+        log_event(LOG_FATAL, "%s", err_msg);
         close(fd);
         return -1;
     }
@@ -56,7 +56,7 @@ int serial_init(const char *device_path)
     tcflush(fd, TCIOFLUSH);
 
     snprintf(err_msg, sizeof(err_msg), "Serial initialized: %s (9600 8N1)", device_path);
-    log_event(LOG_INFO, err_msg);
+    log_event(LOG_INFO, "%s", err_msg);
     return fd;
 }
 
@@ -71,7 +71,7 @@ int serial_send(int fd, RobotPacket pkt)
     {
         char err_msg[128];
         snprintf(err_msg, sizeof(err_msg), "Write mismatch: sent %zd/%zu bytes", n, sizeof(RobotPacket));
-        log_event(LOG_WARN, err_msg);
+        log_event(LOG_WARN, "%s", err_msg);
         return -1;
     }
 

@@ -25,9 +25,9 @@ void ui_render(MenuItem *items, int num_items, int selected, int is_connected)
     erase();
     mvprintw(0, 2, "%s v%s", APP_NAME, APP_VERSION);
     move(1, 2);
-    printw("--- ROCKET ARM V3 CONTROL --- (q to quit) APP_V%s", APP_VERSION);
+    printw("--- ROCKET ARM V3 CONTROL --- (q to quit) APP_VERSION: %s", APP_VERSION);
 
-    move(1, 40);
+    move(2, 2);
     if (is_connected)
     {
         attron(COLOR_PAIR(1));

@@ -25,6 +25,7 @@ set(SOURCES
     src/ui_ncurses.c
     src/serial_linux.c
     src/errhandler.c
+    src/users_handler.c
 )
 
 add_executable(robot_arm ${SOURCES})
@@ -49,6 +50,7 @@ target_include_directories(robot_arm PRIVATE
 
 target_link_libraries(robot_arm PRIVATE 
     ${CURSES_LIBRARIES}
+    sqlite3
 )
 
 target_compile_definitions(robot_arm PRIVATE 

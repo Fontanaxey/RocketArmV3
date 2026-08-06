@@ -10,9 +10,9 @@
 
 int main()
 {
-    char start_msg[64];
+    char start_msg[64] = {0};
     snprintf(start_msg, sizeof(start_msg), "%s v%s started", APP_NAME, APP_VERSION);
-    log_event(LOG_INFO, start_msg);
+    log_event(LOG_INFO, "%s", start_msg);
 
     MenuItem arm_items[] = {
         {"Base Motor", 0x01, DEFAULT_POS},
