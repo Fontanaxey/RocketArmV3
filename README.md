@@ -1,6 +1,6 @@
 # RocketArmV3
 
-A professional-grade **Linux CLI application** written in C for high-precision control of a multi-joint robotic arm. It features a robust binary protocol, real-time Ncurses-based telemetry, and a complete hardware-in-the-loop simulation environment.
+A professional-grade **Linux CLI application** written in C for high-precision control of a multi-joint robotic arm. It features a robust binary protocol, real-time Ncurses-based telemetry, a complete hardware-in-the-loop simulation environment, and persistent user session management via a relational database.
 
 ## Key Features
 
@@ -8,21 +8,21 @@ A professional-grade **Linux CLI application** written in C for high-precision c
 * **Robust Protocol**: Custom 5-byte binary packet with **XOR Checksum** verification to ensure basic data integrity over serial links.
 * **Modular Architecture**: Clean separation between UI logic, Serial communication (POSIX `termios`), and Protocol handling.
 * **Enterprise Logging**: Structured logging system for access and errors with absolute path resolution based on `/proc/self/exe`.
+* **Log In & Authorization**: Database-backed user authentication system managing credentials, access control, and session tracking.
 * **Testing Suite**: Integrated Python-based packet validator and virtual serial port simulation using `socat`.
 
 ## Project Structure
 
 ```text
 .
-├── bin/                # Compiled binaries
 ├── include/            # C Header files (.h)
 ├── src/                # C Source files (.c)
 ├── scripts/            # Automation & Testing (udev rules, python, socat)
 ├── logs/               # Application & Error logs
+├── sql/                # Database schemas, migrations, and seed queries
 ├── Doxyfile
 ├── CMakeLists.txt
 └── LICENSE.md
-```
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ Ensure your Linux environment is ready:
 
 ```bash
 sudo apt update
-sudo apt install -y libncurses5-dev libncursesw5-dev socat python3-pip python3-venv
+sudo apt install -y libncurses5-dev libncursesw5-dev socat python3-pip python3-venv libsqlite3-dev
 ```
 
 ## Documentation
