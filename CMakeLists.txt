@@ -25,6 +25,7 @@ set(SOURCES
     src/ui_ncurses.c
     src/serial_linux.c
     src/errhandler.c
+    src/users_handler.c
 )
 
 add_executable(robot_arm ${SOURCES})
@@ -47,8 +48,13 @@ target_include_directories(robot_arm PRIVATE
     ${CURSES_INCLUDE_DIRS}
 )
 
-target_link_libraries(robot_arm PRIVATE 
-    ${CURSES_LIBRARIES}
+find_package(OpenSSL REQUIRED)
+
+target_link_libraries(robot_arm PRIVATE
+    ncursesw
+    ${FORM_LIBRARY} # o formw
+    sqlite3
+    OpenSSL::Crypto
 )
 
 target_compile_definitions(robot_arm PRIVATE 

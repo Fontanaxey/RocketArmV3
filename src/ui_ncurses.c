@@ -1,14 +1,14 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include "ui_ncurses.h"
-#include "errhandler.h"
+#include "err_handler.h"
 #include "version.h"
 
 void ui_init(void)
 {
     if (initscr() == NULL)
     {
-        log_event(FATAL, "Cannot initialize ncurses (initscr failed)");
+        log_event(LOG_FATAL, "Cannot initialize ncurses (initscr failed)");
         exit(EXIT_FAILURE);
     }
 
@@ -17,7 +17,7 @@ void ui_init(void)
     noecho();
     curs_set(0);
 
-    log_event(ACCESS, "UI module initialized successfully");
+    log_event(LOG_INFO, "UI module initialized successfully");
 }
 
 void ui_render(MenuItem *items, int num_items, int selected, int is_connected)
@@ -25,9 +25,9 @@ void ui_render(MenuItem *items, int num_items, int selected, int is_connected)
     erase();
     mvprintw(0, 2, "%s v%s", APP_NAME, APP_VERSION);
     move(1, 2);
-    printw("--- ROCKET ARM V3 CONTROL --- (q to quit)");
+    printw("--- ROCKET ARM V3 CONTROL --- (q to quit) APP_VERSION: %s", APP_VERSION);
 
-    move(1, 40);
+    move(2, 2);
     if (is_connected)
     {
         attron(COLOR_PAIR(1));
@@ -55,6 +55,6 @@ void ui_render(MenuItem *items, int num_items, int selected, int is_connected)
 
 void ui_cleanup(void)
 {
-    log_event(ACCESS, "UI module shutting down");
+    log_event(LOG_INFO, "UI module shutting down");
     endwin();
 }

@@ -31,4 +31,6 @@ __pycache__/
 
 # --- System ---
 .DS_Store
-Thumbs.dbdata/*.db
+data/
+*.o
+*.log
