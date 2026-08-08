@@ -20,11 +20,13 @@ static void get_absolute_log_path(char *dest, size_t dest_size, const char *file
     if (len != -1)
     {
         exe_path[len] = '\0';
-        char *exe_dir = dirname(exe_path);
-        snprintf(dest, dest_size, "%s/../logs/%s", exe_dir, filename);
+        char *exe_dir = dirname(exe_path); // Risultato: .../ROCKETARMV3/build/bin
+        snprintf(dest, dest_size, "%s/../../logs/%s", exe_dir, filename);
     }
     else
+    {
         snprintf(dest, dest_size, "logs/%s", filename);
+    }
 }
 
 void log_event(LogType type, const char *fmt, ...)
@@ -34,7 +36,6 @@ void log_event(LogType type, const char *fmt, ...)
     const char *filename;
     const char *level_str;
 
-    // Routing dei log in base al tipo di evento
     switch (type)
     {
     case LOG_INFO:
@@ -69,7 +70,6 @@ void log_event(LogType type, const char *fmt, ...)
         return;
     }
 
-    // Formattazione variadica del messaggio
     va_list args;
     va_start(args, fmt);
     vsnprintf(formatted_msg, sizeof(formatted_msg), fmt, args);
@@ -77,7 +77,6 @@ void log_event(LogType type, const char *fmt, ...)
 
     get_absolute_log_path(final_path, sizeof(final_path), filename);
 
-    // Timestamp reentrante (thread-safe)
     time_t now = time(NULL);
     struct tm t;
     localtime_r(&now, &t);
@@ -87,12 +86,12 @@ void log_event(LogType type, const char *fmt, ...)
     FILE *file = fopen(final_path, "a");
     if (file == NULL)
     {
-        fprintf(stderr, "[%s] [CRIT] Impossibile aprire il file di log %s: %s\n",
+        fprintf(stderr, "[%s] [CRIT] can't open log file %s: %s\n",
                 timestamp, final_path, strerror(errno));
         return;
     }
 
     fprintf(file, "[%s] [%s] %s\n", timestamp, level_str, formatted_msg);
-    fflush(file); // Forza la scrittura immediata su disco
+    fflush(file);
     fclose(file);
 }

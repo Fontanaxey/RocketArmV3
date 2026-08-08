@@ -48,9 +48,13 @@ target_include_directories(robot_arm PRIVATE
     ${CURSES_INCLUDE_DIRS}
 )
 
-target_link_libraries(robot_arm PRIVATE 
-    ${CURSES_LIBRARIES}
+find_package(OpenSSL REQUIRED)
+
+target_link_libraries(robot_arm PRIVATE
+    ncursesw
+    ${FORM_LIBRARY} # o formw
     sqlite3
+    OpenSSL::Crypto
 )
 
 target_compile_definitions(robot_arm PRIVATE 
